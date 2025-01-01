@@ -49,7 +49,7 @@ extensions = [".md", ".txt", ".h", ".cpp", ".inl", ".as"]
 
 - **Efficient Navigation**
   ```bash
-  grimoire -n -s "pattern"   # Get file summary with line numbers
+  grimoire -n -m "pattern"   # Get file summary with line numbers
   grimoire -n -L 42 "query"  # Jump to specific line
   ```
 
@@ -58,7 +58,7 @@ extensions = [".md", ".txt", ".h", ".cpp", ".inl", ".as"]
 1. **Find Implementations**
    ```bash
    # Get overview
-   grimoire -s -s "function_name"  # -s (sources), -s (summary)
+   grimoire -s -m "function_name"  # -s (sources), -s (summary)
    
    # Examine specific match
    grimoire -s -c 3 -L 42 "function_name"
@@ -67,7 +67,7 @@ extensions = [".md", ".txt", ".h", ".cpp", ".inl", ".as"]
 2. **Search Documentation**
    ```bash
    # List all documentation files
-   grimoire -n -s "."
+   grimoire -n -m "."
    
    # Find specific topic
    grimoire -n -c 2 "topic"
