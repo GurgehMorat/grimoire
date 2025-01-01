@@ -110,7 +110,7 @@ def main():
     parser.add_argument('--no-cache',
                        action='store_true',
                        help='Disable result caching')
-    parser.add_argument('-s', '--summary',
+    parser.add_argument('-m', '--summary',
                        action='store_true',
                        help='Show only file summary with match counts')
     parser.add_argument('-L', '--line',
