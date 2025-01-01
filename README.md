@@ -58,7 +58,7 @@ extensions = [".md", ".txt", ".h", ".cpp", ".inl", ".as"]
 1. **Find Implementations**
    ```bash
    # Get overview
-   grimoire -s -m "function_name"  # -s (sources), -s (summary)
+   grimoire -s -m "function_name"  # -s (sources), -m (summary)
    
    # Examine specific match
    grimoire -s -c 3 -L 42 "function_name"
