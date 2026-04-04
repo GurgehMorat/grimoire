@@ -131,7 +131,7 @@ class GrimoireSearcher:
 
                     lines = self._get_file_contents(file_path)
                     for i, line in enumerate(lines):
-                        if re.search(pattern, line, re.IGNORECASE):
+                        if re.search(re.escape(pattern), line, re.IGNORECASE):
                             match = self._get_context(lines, i, context_after, context_before)
                             match.file_path = file_path
                             results.append(match)
