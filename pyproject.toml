@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "grimoire"
-version = "1.0.0"
+version = "2.1.0"
 authors = [
   { name="Development Team" },
 ]
@@ -12,8 +12,7 @@ description = "Flexible technical documentation and source code search tool"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "tomli>=2.0.0",  # for Python < 3.11
-    "tomli-w>=1.0.0"  # for writing TOML files
+    "tomli>=2.0.0",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
