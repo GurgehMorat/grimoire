@@ -46,21 +46,24 @@ DEFAULT_IGNORE_DIRS = {
     '.venv', 'venv', 'dist', 'build', 'target', '.next',
     '.nuxt', '.idea', '.vscode', '.mypy_cache', '.pytest_cache',
     '.tox', '.cache', 'vendor', 'bower_components', '.ruff_cache',
-    'out',
+    'out', 'worktrees', 'htmlcov',
 }
 
 
 def _find_project_config_in_registry() -> Optional[Path]:
     """Look up CWD in ~/.grimoire/projects/ registry.
 
-    Matches by checking if [project].root in any config file
-    is a parent of (or equal to) CWD.
+    Matches when CWD is inside the project root OR the project root
+    is inside CWD (e.g. CWD=$HOME, project at $HOME/dev/platform).
+    When multiple projects match, the deepest (most specific) wins.
     """
     projects_dir = Path.home() / '.grimoire' / 'projects'
     if not projects_dir.is_dir():
         return None
 
     cwd = Path.cwd().resolve()
+    best_match = None
+    best_depth = -1
 
     for config_file in projects_dir.glob('*.toml'):
         try:
@@ -72,11 +75,20 @@ def _find_project_config_in_registry() -> Optional[Path]:
             project_path = Path(project_root).resolve()
             # CWD is inside this project
             if cwd == project_path or project_path in cwd.parents:
-                return config_file
+                depth = len(project_path.parts)
+                if depth > best_depth:
+                    best_match = config_file
+                    best_depth = depth
+            # Project is inside CWD (e.g. CWD=$HOME)
+            elif cwd in project_path.parents:
+                depth = len(project_path.parts)
+                if depth > best_depth:
+                    best_match = config_file
+                    best_depth = depth
         except Exception:
             continue
 
-    return None
+    return best_match
 
 
 def find_config_path() -> tuple[Optional[Path], Optional[Path]]:
@@ -105,6 +117,29 @@ def find_config_path() -> tuple[Optional[Path], Optional[Path]]:
     if registry_config:
         # project_root is stored inside the config, will be read during load
         return registry_config, None
+
+    # When CWD is $HOME, scan immediate subdirectories (depth 2) for
+    # project-local configs — covers repos cloned under ~/dev/*/
+    if cwd == home:
+        best = None
+        for child in home.iterdir():
+            if not child.is_dir() or child.name.startswith('.'):
+                continue
+            candidate = child / LOCAL_CONFIG_NAME
+            if candidate.exists():
+                best = (candidate, child)
+                continue
+            # One level deeper (e.g. ~/dev/platform/.grimoire.toml)
+            for grandchild in child.iterdir():
+                if not grandchild.is_dir() or grandchild.name.startswith('.'):
+                    continue
+                candidate = grandchild / LOCAL_CONFIG_NAME
+                if candidate.exists():
+                    # Prefer deeper (more specific) matches
+                    if best is None or len(grandchild.parts) > len(best[1].parts):
+                        best = (candidate, grandchild)
+        if best:
+            return best
 
     # Fall back to global config paths
     for path in GLOBAL_CONFIG_PATHS:
