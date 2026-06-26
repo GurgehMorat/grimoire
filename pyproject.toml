@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "grimoire"
-version = "2.1.0"
+version = "2.2.0"
 authors = [
   { name="Development Team" },
 ]
