@@ -112,6 +112,12 @@ class GrimoireSearcher:
         if self.config.cache_results and cache_key in self._result_cache:
             return self._result_cache[cache_key]
 
+        # Compile pattern once; treat as regex, fall back to literal on error.
+        try:
+            compiled = re.compile(pattern, re.IGNORECASE)
+        except re.error:
+            compiled = re.compile(re.escape(pattern), re.IGNORECASE)
+
         results: List[SearchMatch] = []
 
         for path_key in paths:
@@ -131,7 +137,7 @@ class GrimoireSearcher:
 
                     lines = self._get_file_contents(file_path)
                     for i, line in enumerate(lines):
-                        if re.search(re.escape(pattern), line, re.IGNORECASE):
+                        if compiled.search(line):
                             match = self._get_context(lines, i, context_after, context_before)
                             match.file_path = file_path
                             results.append(match)
